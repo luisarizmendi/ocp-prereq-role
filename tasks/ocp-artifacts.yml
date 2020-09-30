@@ -83,7 +83,7 @@
 
     - name: Download RHCOS compressed kernel image
       shell: |
-        NAME_KERNEL=$(curl -s {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/ | grep rhcos |  awk -F '<a href=\"' '{print $2}' | awk -F '\">' '{print $1}' | grep kernel)
+        NAME_KERNEL=$(curl -s {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/ | grep rhcos |  awk -F '<a href=\"' '{print $2}' | awk -F '\">' '{print $1}' | grep kernel | head -n 1)
         if [ ! -f "{{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-installer-kernel" ]; then
           curl --compressed -J -L -o {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-installer-kernel {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/$NAME_KERNEL
         fi
