@@ -74,7 +74,7 @@
 
     - name: Download RHCOS compressed metal BIOS
       shell: |
-        NAME_METAL=$(curl -s {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/ | grep rhcos |  awk -F '<a href=\"' '{print $2}' | awk -F '\">' '{print $1}' | grep metal)
+        NAME_METAL=$(curl -s {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/ | grep rhcos |  awk -F '<a href=\"' '{print $2}' | awk -F '\">' '{print $1}' | grep metal | head -n 1)
         if [ ! -f "{{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-metal.raw.gz" ]; then
           curl --compressed -J -L -o {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-metal.raw.gz {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/$NAME_METAL
         fi
@@ -92,7 +92,7 @@
 
     - name: Download RHCOS compressed initramfs
       shell: |
-        NAME_INIT=$(curl -s {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/ | grep rhcos |  awk -F '<a href=\"' '{print $2}' | awk -F '\">' '{print $1}' | grep init)
+        NAME_INIT=$(curl -s {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/ | grep rhcos |  awk -F '<a href=\"' '{print $2}' | awk -F '\">' '{print $1}' | grep init | head -n 1)
         if [ ! -f "{{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-installer-initramfs.img" ]; then
           curl --compressed -J -L -o {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-installer-initramfs.img {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/$NAME_INIT
         fi
