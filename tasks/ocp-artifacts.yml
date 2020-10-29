@@ -143,41 +143,41 @@
 
 
 
-    - name: Injecting local user in ignition files
-      when:
-        - ocp_inject_user_ignition == "true"
-      become: true
-      tags: install
-      block:
-
-        - name: Get local user password hash
-          shell: |
-            python3 -c 'import crypt; print(crypt.crypt("{{ ocp_local_userpass }}", crypt.mksalt(crypt.METHOD_SHA512)))'
-          register: hash
-
-
-        - name: Setting hostname as a fact
-          set_fact:
-            ocp_local_userpass_hash: "{{ hash.stdout }}"
-
-
-        - name: Copy string for include user on ignition file
-          template:
-            src: ignition_userpasswd.j2
-            dest: /tmp/ignition_userpasswd
-
-
-        - name: Include local user in ignition files
-          shell: |
-            cd {{ ocp_install_path }}/install/
-            for i in $((find . -maxdepth 1 -type f | grep ign$) | cut -d'/' -f2 | grep -v boot)
-            do
-              mv $i $i.original ; touch $i
-              echo "$(cat  $i.original | awk -F '"passwd":' '{print $1}')\"passwd\":{\"users\":[$(cat /tmp/ignition_userpasswd)]},\"storage\":{},\"systemd\":{}}" > $i
-            done
-            bootstrapname=$((find . -maxdepth 1 -type f | grep ign$) | cut -d'/' -f2 | grep boot)
-            mv $bootstrapname $bootstrapname.original ; touch $bootstrapname
-            echo "$(cat  $bootstrapname.original | awk -F ']},"storage":' '{print $1}'),$(cat /tmp/ignition_userpasswd)]},\"storage\":$(cat  $bootstrapname.original | awk -F ']},"storage":' '{print $2}')" > $bootstrapname
+#    - name: Injecting local user in ignition files
+#      when:
+#        - ocp_inject_user_ignition == "true"
+#      become: true
+#      tags: install
+#      block:
+#
+#        - name: Get local user password hash
+#          shell: |
+#            python3 -c 'import crypt; print(crypt.crypt("{{ ocp_local_userpass }}", crypt.mksalt(crypt.METHOD_SHA512)))'
+#          register: hash
+#
+#
+#        - name: Setting hostname as a fact
+#          set_fact:
+#            ocp_local_userpass_hash: "{{ hash.stdout }}"
+#
+#
+#        - name: Copy string for include user on ignition file
+#          template:
+#            src: ignition_userpasswd.j2
+#            dest: /tmp/ignition_userpasswd
+#
+#
+#        - name: Include local user in ignition files
+#          shell: |
+#            cd {{ ocp_install_path }}/install/
+#            for i in $((find . -maxdepth 1 -type f | grep ign$) | cut -d'/' -f2 | grep -v boot)
+#            do
+#              mv $i $i.original ; touch $i
+#              echo "$(cat  $i.original | awk -F '"passwd":' '{print $1}')\"passwd\":{\"users\":[$(cat /tmp/ignition_userpasswd)]},\"storage\":{},\"systemd\":{}}" > $i
+#            done
+#            bootstrapname=$((find . -maxdepth 1 -type f | grep ign$) | cut -d'/' -f2 | grep boot)
+#            mv $bootstrapname $bootstrapname.original ; touch $bootstrapname
+#            echo "$(cat  $bootstrapname.original | awk -F ']},"storage":' '{print $1}'),$(cat /tmp/ignition_userpasswd)]},\"storage\":$(cat  $bootstrapname.original | awk -F ']},"storage":' '{print $2}')" > $bootstrapname
 
 
 
