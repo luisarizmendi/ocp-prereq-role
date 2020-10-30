@@ -149,24 +149,24 @@
 #      become: true
 #      tags: install
 #      block:
-#
+
 #        - name: Get local user password hash
 #          shell: |
 #            python3 -c 'import crypt; print(crypt.crypt("{{ ocp_local_userpass }}", crypt.mksalt(crypt.METHOD_SHA512)))'
 #          register: hash
-#
-#
+
+
 #        - name: Setting hostname as a fact
 #          set_fact:
 #            ocp_local_userpass_hash: "{{ hash.stdout }}"
-#
-#
+
+
 #        - name: Copy string for include user on ignition file
 #          template:
 #            src: ignition_userpasswd.j2
 #            dest: /tmp/ignition_userpasswd
-#
-#
+
+
 #        - name: Include local user in ignition files
 #          shell: |
 #            cd {{ ocp_install_path }}/install/
