@@ -142,6 +142,18 @@
         /usr/local/bin/openshift-install create ignition-configs --dir={{ ocp_install_path }}/install/
 
 
+    - name: Create a copy of the originals
+      ignore_errors: yes
+      shell: |
+        cd {{ ocp_install_path }}/install/
+        for i in $((find . -maxdepth 1 -type f | grep ign$) | cut -d'/' -f2 | grep -v boot)
+        do
+          cp $i $i.original 
+        done
+        bootstrapname=$((find . -maxdepth 1 -type f | grep ign$) | cut -d'/' -f2 | grep boot)
+        cp $bootstrapname $bootstrapname.original 
+
+
 
 #    - name: Injecting local user in ignition files
 #      when:
@@ -178,6 +190,8 @@
 #            bootstrapname=$((find . -maxdepth 1 -type f | grep ign$) | cut -d'/' -f2 | grep boot)
 #            mv $bootstrapname $bootstrapname.original ; touch $bootstrapname
 #            echo "$(cat  $bootstrapname.original | awk -F ']},"storage":' '{print $1}'),$(cat /tmp/ignition_userpasswd)]},\"storage\":$(cat  $bootstrapname.original | awk -F ']},"storage":' '{print $2}')" > $bootstrapname
+
+
 
 
 

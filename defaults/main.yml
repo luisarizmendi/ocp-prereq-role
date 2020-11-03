@@ -129,7 +129,8 @@ ocp_install_path: "{{ ansible_env.HOME }}/ocp"
 ocp_mirror: "https://mirror.openshift.com/pub/openshift-v4"
 ocp_install_config_path: ""
 
-ocp_inject_user_ignition: "false"
+#disabled
+#ocp_inject_user_ignition: "false"
 ocp_local_username: "redhattrouble"
 ocp_local_userpass: "redhatfix"
 
