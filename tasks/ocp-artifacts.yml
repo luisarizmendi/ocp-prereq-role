@@ -72,14 +72,28 @@
         restorecon -vR /var/www/html/
 
 
-    - name: Download RHCOS compressed metal BIOS
+    - name: Download RHCOS image (compressed metal BIOS)
       shell: |
         NAME_METAL=$(curl -s {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/ | grep rhcos |  awk -F '<a href=\"' '{print $2}' | awk -F '\">' '{print $1}' | grep metal | head -n 1)
-        if [ ! -f "{{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-metal.raw.gz" ]; then
-          curl --compressed -J -L -o {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-metal.raw.gz {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/$NAME_METAL
+        if [ ! -f "{{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rhcosimage" ]; then
+          curl --compressed -J -L -o {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rhcosimage {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/$NAME_METAL
         fi
+      when:
+        - ocp_release.split(".")[1]|int < 6
       args:
         warn: false
+
+    - name: Download RHCOS image (rootfs)
+      shell: |
+        NAME_METAL=$(curl -s {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/ | grep rhcos |  awk -F '<a href=\"' '{print $2}' | awk -F '\">' '{print $1}' | grep rootfs | head -n 1)
+        if [ ! -f "{{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rhcosimage" ]; then
+          curl --compressed -J -L -o {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rhcosimage {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/$NAME_METAL
+        fi
+      when:
+        - ocp_release.split(".")[1]|int >= 6
+      args:
+        warn: false
+
 
     - name: Download RHCOS compressed kernel image
       shell: |
@@ -99,10 +113,10 @@
       args:
         warn: false
 
-    - name: Upload the compressed metal BIOS file and the kernel and initramfs files to your HTTP server
+    - name: Upload the rhcosimage file and the kernel and initramfs files to your HTTP server
       shell: |
         mkdir -p /var/www/html/images
-        cp {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-metal.raw.gz /var/www/html/images/rhcos-metal.raw.gz
+        cp {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rhcosimage /var/www/html/images/rhcos-rhcosimage
         cp {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-installer-kernel /var/www/html/images/rhcos-installer-kernel
         cp {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-installer-initramfs.img /var/www/html/images/rhcos-installer-initramfs.img
 
@@ -148,10 +162,10 @@
         cd {{ ocp_install_path }}/install/
         for i in $((find . -maxdepth 1 -type f | grep ign$) | cut -d'/' -f2 | grep -v boot)
         do
-          cp $i $i.original 
+          cp $i $i.original
         done
         bootstrapname=$((find . -maxdepth 1 -type f | grep ign$) | cut -d'/' -f2 | grep boot)
-        cp $bootstrapname $bootstrapname.original 
+        cp $bootstrapname $bootstrapname.original
 
 
 
