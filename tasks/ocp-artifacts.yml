@@ -75,8 +75,8 @@
     - name: Download RHCOS image (compressed metal BIOS)
       shell: |
         NAME_METAL=$(curl -s {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/ | grep rhcos |  awk -F '<a href=\"' '{print $2}' | awk -F '\">' '{print $1}' | grep metal | head -n 1)
-        if [ ! -f "{{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rhcosimage" ]; then
-          curl --compressed -J -L -o {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rhcosimage {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/$NAME_METAL
+        if [ ! -f "{{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-metal.raw.gz" ]; then
+          curl --compressed -J -L -o {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-metal.raw.gz {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/$NAME_METAL
         fi
       when:
         - ocp_release.split(".")[1]|int < 6
@@ -86,8 +86,8 @@
     - name: Download RHCOS image (rootfs)
       shell: |
         NAME_METAL=$(curl -s {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/ | grep rhcos |  awk -F '<a href=\"' '{print $2}' | awk -F '\">' '{print $1}' | grep rootfs | head -n 1)
-        if [ ! -f "{{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rhcosimage" ]; then
-          curl --compressed -J -L -o {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rhcosimage {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/$NAME_METAL
+        if [ ! -f "{{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rootfs.img" ]; then
+          curl --compressed -J -L -o {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rootfs.img {{ ocp_mirror }}/dependencies/rhcos/4.{{  ocp_release.split(".")[1] | lower }}/latest/$NAME_METAL
         fi
       when:
         - ocp_release.split(".")[1]|int >= 6
@@ -114,9 +114,11 @@
         warn: false
 
     - name: Upload the rhcosimage file and the kernel and initramfs files to your HTTP server
+      ignore_errors: yes
       shell: |
         mkdir -p /var/www/html/images
-        cp {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rhcosimage /var/www/html/images/rhcos-rhcosimage
+        cp {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-metal.raw.gz /var/www/html/images/rhcos-metal.raw.gz
+        cp {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-rootfs.img /var/www/html/images/rhcos-rootfs.img
         cp {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-installer-kernel /var/www/html/images/rhcos-installer-kernel
         cp {{ ocp_install_path }}/artifacts/openshift-images/rhcos-4.{{  ocp_release.split(".")[1] | lower }}-installer-initramfs.img /var/www/html/images/rhcos-installer-initramfs.img
 

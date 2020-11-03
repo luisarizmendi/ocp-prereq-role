@@ -34,11 +34,21 @@
 
 
     - name: Set the tftp file pre-procesed
+      when:
+        - ocp_release.split(".")[1]|int < 6
+      template:
+        src: all-default-pre_4_5.j2
+        dest: /var/lib/tftpboot/pxelinux.cfg/all-default
+        mode: 0555
+
+
+    - name: Set the tftp file pre-procesed
+      when:
+        - ocp_release.split(".")[1]|int >= 6
       template:
         src: all-default.j2
         dest: /var/lib/tftpboot/pxelinux.cfg/all-default
         mode: 0555
-
 
     - name: Installing PXE file extractor
       copy:
