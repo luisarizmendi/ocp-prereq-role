@@ -118,6 +118,8 @@ dhcp:
 ## PXE
 ocp_prereq_pxe: "true"
 pxe:
+  nic: "ens3"
+  nicsecondary: "ens4"
   http_ip: "{{ httpipaddr }}"
   http_port: "{{ http.port }}"
 
